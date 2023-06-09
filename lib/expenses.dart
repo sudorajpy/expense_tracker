@@ -61,10 +61,34 @@ class _ExpensesState extends State<Expenses> {
     setState(() {
       _registeredExpenses.remove(expense);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: const Color.fromARGB(255, 13, 13, 13),
+      content:const Text('Expense deleted'),
+      duration: const Duration(seconds: 2),
+      action: SnackBarAction(
+        label: 'UNDO',
+        onPressed: () {
+          setState(() {
+            _registeredExpenses.add(expense);
+          });
+        },
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+
+    Widget mainContent = const Center(child: Text('No expenses added yet!'));
+
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = ExpensesList(
+        expenses: _registeredExpenses,
+        deleteExpense: _deleteExpense,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -75,7 +99,7 @@ class _ExpensesState extends State<Expenses> {
       body: Column(
         children: [
           const Text('Expenses'),
-          Expanded(child: ExpensesList(expenses: _registeredExpenses, deleteExpense: _deleteExpense,)),
+          Expanded(child: mainContent ),
         ],
       ),
     );
